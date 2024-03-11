@@ -13,6 +13,8 @@ type Config struct {
 	DbUser         string `yaml:"db_user"`
 	DbPassword     string `yaml:"db_password"`
 	DbName         string `yaml:"db_name"`
+	DbHost         string `yaml:"db_host"`
+	DbPort         string `yaml:"db_port"`
 	JwtPrivateFile string `yaml:"jwt_private_file"`
 	JwtPublicFile  string `yaml:"jwt_public_file"`
 }

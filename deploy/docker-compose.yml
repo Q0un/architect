@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5001:5432
+    volumes: 
+      - db:/var/lib/postgresql/data
+      - ../sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+  users-api:
+    container_name: users-api
+    build:
+      context: ../
+      dockerfile: ./build/users/Dockerfile
+    image: users-api
+    depends_on:
+      - db
+    ports:
+      - 5000:5000
+    links:
+      - db
+volumes:
+  db:
+    driver: local

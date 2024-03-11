@@ -28,10 +28,12 @@ func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) 
 	db, err := sqlx.Connect(
 		"postgres",
 		fmt.Sprintf(
-			"user=%s password=%s dbname=%s sslmode=disable",
+			"user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
 			config.DbUser,
 			config.DbPassword,
 			config.DbName,
+			config.DbHost,
+			config.DbPort,
 		),
 	)
 	if err != nil {
