@@ -8,15 +8,13 @@ object User {
     id: uint64
     login: string
     password: string
-    task_ids: uint64[]
 }
 
 object Task {
     id: uint64
-    admin_ids: uint64[]
+    admin: uint64
     body: string
     status: enum
-    comment_ids: uint64[]
 }
 
 object Comment {
@@ -31,16 +29,13 @@ object Statistics {
     task_id: uint64/null
     comment_id: uint64/null
     likes_count: uint64
-    like_user_ids: uint64[]
     views_count: uint64
-    view_user_ids: uint64[]
 }
 
-User }|..o{ Task
+User }|..o| Task
 Task ||..o{ Comment
 Task ||..|| Statistics
 User ||..o{ Comment
-User }o..o{ Statistics
 Comment ||..|| Statistics
 
 @enduml
