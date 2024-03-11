@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jmoiron/sqlx"
@@ -146,6 +147,10 @@ func (service *UsersService) EditInfo(ctx context.Context, req *api.EditInfoRequ
 		user.Surname.Scan(req.GetSurname())
 	}
 	if req.Birthday != nil {
+		_, err := time.Parse(time.DateOnly, req.GetBirthday())
+		if err != nil {
+			return fmt.Errorf("Bad birthday format. Valid one is YYYY-MM-DD")
+		}
 		user.Birthday.Scan(req.GetBirthday())
 	}
 	if req.Mail != nil {
