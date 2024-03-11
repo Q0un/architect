@@ -105,11 +105,11 @@ func (service *UsersService) SignIn(ctx context.Context, req *api.SignInRequest)
 	user := User{}
 	err := service.db.Get(&user, "SELECT * FROM users WHERE login=$1", req.GetLogin())
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("Wrong login or password")
 	}
 
 	if md5Password(req.GetLogin(), req.GetPassword()) != user.Password {
-		return "", fmt.Errorf("Wrong password")
+		return "", fmt.Errorf("Wrong login or password")
 	}
 
 	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
@@ -128,7 +128,7 @@ func (service *UsersService) EditInfo(ctx context.Context, req *api.EditInfoRequ
 		return service.jwtPublic, nil
 	})
 	if err != nil || !token.Valid {
-		return fmt.Errorf("Bad jwt-token header")
+		return fmt.Errorf("Bad auth header")
 	}
 
 	login := token.Claims.(jwt.MapClaims)["login"].(string)
@@ -136,7 +136,7 @@ func (service *UsersService) EditInfo(ctx context.Context, req *api.EditInfoRequ
 	user := User{}
 	err = service.db.Get(&user, "SELECT * FROM users WHERE login=$1", login)
 	if err != nil {
-		return fmt.Errorf("Bad jwt-token header")
+		return fmt.Errorf("Bad auth header")
 	}
 
 	if req.Name != nil {
