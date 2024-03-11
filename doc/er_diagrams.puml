@@ -1,0 +1,41 @@
+@startuml Task tracker ER Diagrams
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+skinparam wrapWidth 300
+LAYOUT_LANDSCAPE()
+
+object User {
+    id: uint64
+    login: string
+    password: string
+}
+
+object Task {
+    id: uint64
+    admin: uint64
+    body: string
+    status: enum
+}
+
+object Comment {
+    id: uint64
+    task_id: uint64
+    author_id: uint64
+    reply_to_id: uint64/null
+    body: string
+}
+
+object Statistics {
+    task_id: uint64/null
+    comment_id: uint64/null
+    likes_count: uint64
+    views_count: uint64
+}
+
+User }|..o| Task
+Task ||..o{ Comment
+Task ||..|| Statistics
+User ||..o{ Comment
+Comment ||..|| Statistics
+
+@enduml
