@@ -3,6 +3,8 @@ syntax = "proto3";
 package api;
 
 import "google/api/annotations.proto";
+import "tickenator/ticket.proto";
+import "api/tickenator.proto";
 
 option go_package = "proto/api";
 
@@ -24,6 +26,41 @@ service UsersService {
     rpc EditInfo(EditInfoRequest) returns (EditInfoResponse) {
         option (google.api.http) = {
             put: "/api/users"
+            body: "*"
+        };
+    }
+
+    rpc CreateTicket(CreateTicketHttpRequest) returns (CreateTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/create_ticket"
+            body: "*"
+        };
+    }
+
+    rpc UpdateTicket(UpdateTicketHttpRequest) returns (UpdateTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/update_ticket"
+            body: "*"
+        };
+    }
+
+    rpc DeleteTicket(DeleteTicketHttpRequest) returns (DeleteTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/delete_ticket"
+            body: "*"
+        };
+    }
+
+    rpc GetTicket(GetTicketHttpRequest) returns (tickenator.Ticket) {
+        option (google.api.http) = {
+            put: "/api/get_ticket"
+            body: "*"
+        };
+    }
+    
+    rpc ListTickets(ListTicketsHttpRequest) returns (ListTicketsResponse) {
+        option (google.api.http) = {
+            put: "/api/list_tickets"
             body: "*"
         };
     }
@@ -60,4 +97,38 @@ message EditInfoRequest {
 }
 
 message EditInfoResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message CreateTicketHttpRequest {
+    string name = 1;
+    string description = 2;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message UpdateTicketHttpRequest {
+    uint64 id = 1;
+    optional string name = 2;
+    optional string description = 3;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message DeleteTicketHttpRequest {
+    uint64 id = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message GetTicketHttpRequest {
+    uint64 id = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message ListTicketsHttpRequest {
+    uint64 page_num = 1;
+    uint64 page_size = 2;
 }

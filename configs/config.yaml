@@ -1,8 +1,0 @@
-http_address: :5000
-db_user: postgres
-db_password: postgres
-db_name: postgres
-db_host: db
-db_port: 5432
-jwt_private_file: rs256.rsa
-jwt_public_file: rs256.rsa.pub

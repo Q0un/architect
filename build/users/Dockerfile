@@ -21,7 +21,7 @@ RUN apk update && \
     openssl
 
 COPY --from=builder /build/users ./
-COPY ./configs/config.yaml ./
+COPY ./configs/users.yaml ./config.yaml
 
 RUN ssh-keygen -t rsa -P "" -b 4096 -m PEM -f rs256.rsa
 RUN openssl rsa -in rs256.rsa -pubout -outform PEM -out rs256.rsa.pub

@@ -8,3 +8,10 @@ CREATE TABLE users (
     mail TEXT,
     phone TEXT
 );
+
+CREATE TABLE tickets (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    author_id BIGINT
+);

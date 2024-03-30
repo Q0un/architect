@@ -3,17 +3,17 @@ package users
 import (
 	"context"
 	"fmt"
-	"log"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 
 	"github.com/Q0un/architect/proto/api"
+	proto "github.com/Q0un/architect/proto/tickenator"
 )
 
 func HandlerMatcher(key string) (string, bool) {
@@ -25,8 +25,41 @@ func HandlerMatcher(key string) (string, bool) {
 
 type API struct {
 	api.UnimplementedUsersServiceServer
-	logger  *log.Logger
 	service *UsersService
+}
+
+func (a *API) getUserId(ctx context.Context) (uint64, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return 0, fmt.Errorf("Pass auth header")
+	}
+	if len(md["authorization"]) == 0 {
+		return 0, fmt.Errorf("Pass auth header")
+	}
+
+	token, err := jwt.Parse(md["authorization"][0], func(token *jwt.Token) (interface{}, error) {
+		return a.service.jwtPublic, nil
+	})
+	if err != nil || !token.Valid {
+		return 0, fmt.Errorf("Bad auth header")
+	}
+
+	idValue, ok := token.Claims.(jwt.MapClaims)["id"]
+	if !ok {
+		return 0, fmt.Errorf("Bad auth header")
+	}
+
+	idStr, ok := idValue.(string)
+	if !ok {
+		return 0, fmt.Errorf("Bad auth header")
+	}
+
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("Bad auth header")
+	}
+
+	return id, nil
 }
 
 // SignUp implements api.UsersServiceServer
@@ -61,16 +94,106 @@ func (a *API) SignIn(ctx context.Context, req *api.SignInRequest) (*api.SignInRe
 
 // SignIn implements api.UsersServiceServer
 func (a *API) EditInfo(ctx context.Context, req *api.EditInfoRequest) (*api.EditInfoResponse, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, status.Errorf(codes.DataLoss, "Failed to get metadata")
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
 	}
-
-	if len(md["authorization"]) == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "Missing 'authorization' header")
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
 	}
+	return &api.EditInfoResponse{}, a.service.EditInfo(ctx, req, id)
+}
 
-	return &api.EditInfoResponse{}, a.service.EditInfo(ctx, req, md["authorization"][0])
+// CreateTicket implements api.TickenatorServiceServer
+func (a *API) CreateTicket(ctx context.Context, req *api.CreateTicketHttpRequest) (*api.CreateTicketResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+	return a.service.tickenator.CreateTicket(
+		ctx, 
+		&api.CreateTicketRequest{
+			UserId:      id,
+			Name:        req.Name,
+			Description: req.Description,
+		},
+	)
+}
+
+// UpdateTicket implements api.TickenatorServiceServer
+func (a *API) UpdateTicket(ctx context.Context, req *api.UpdateTicketHttpRequest) (*api.UpdateTicketResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+	return a.service.tickenator.UpdateTicket(
+		ctx, 
+		&api.UpdateTicketRequest{
+			UserId:      id,
+			Id:          req.Id,
+			Name:        req.Name,
+			Description: req.Description,
+		},
+	)
+}
+
+// DeleteTicket implements api.TickenatorServiceServer
+func (a *API) DeleteTicket(ctx context.Context, req *api.DeleteTicketHttpRequest) (*api.DeleteTicketResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+	return a.service.tickenator.DeleteTicket(
+		ctx, 
+		&api.DeleteTicketRequest{
+			UserId: id,
+			Id:     req.Id,
+		},
+	)
+}
+
+// GetTicket implements api.TickenatorServiceServer
+func (a *API) GetTicket(ctx context.Context, req *api.GetTicketHttpRequest) (*proto.Ticket, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+	return a.service.tickenator.GetTicket(
+		ctx, 
+		&api.GetTicketRequest{
+			Id: req.Id,
+		},
+	)
+}
+
+// ListTickets implements api.TickenatorServiceServer
+func (a *API) ListTickets(ctx context.Context, req *api.ListTicketsHttpRequest) (*api.ListTicketsResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+	return a.service.tickenator.ListTickets(
+		ctx, 
+		&api.ListTicketsRequest{
+			PageNum:  req.PageNum,
+			PageSize: req.PageSize,
+		},
+	)
 }
 
 func (a *API) Mount(router chi.Router) {

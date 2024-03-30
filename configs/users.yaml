@@ -1,0 +1,11 @@
+http_address: :5000
+db:
+  user: postgres
+  password: postgres
+  name: postgres
+  host: db
+  port: 5432
+jwt:
+  private_file: rs256.rsa
+  public_file: rs256.rsa.pub
+tickenator_host: tickenator:5001
