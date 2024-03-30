@@ -23,7 +23,7 @@ service UsersService {
 
     rpc EditInfo(EditInfoRequest) returns (EditInfoResponse) {
         option (google.api.http) = {
-            post: "/api/edit"
+            put: "/api/users"
             body: "*"
         };
     }
