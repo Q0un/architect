@@ -6,16 +6,16 @@ info:
     title: UsersService API
     version: 0.0.1
 paths:
-    /api/edit:
-        post:
+    /api/create_ticket:
+        put:
             tags:
                 - UsersService
-            operationId: UsersService_EditInfo
+            operationId: UsersService_CreateTicket
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/EditInfoRequest'
+                            $ref: '#/components/schemas/CreateTicketHttpRequest'
                 required: true
             responses:
                 "200":
@@ -23,7 +23,79 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/EditInfoResponse'
+                                $ref: '#/components/schemas/CreateTicketResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/delete_ticket:
+        put:
+            tags:
+                - UsersService
+            operationId: UsersService_DeleteTicket
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DeleteTicketHttpRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteTicketResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/get_ticket:
+        put:
+            tags:
+                - UsersService
+            operationId: UsersService_GetTicket
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetTicketHttpRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Ticket'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/list_tickets:
+        put:
+            tags:
+                - UsersService
+            operationId: UsersService_ListTickets
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListTicketsHttpRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListTicketsResponse'
                 default:
                     description: Default error response
                     content:
@@ -78,8 +150,76 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/update_ticket:
+        put:
+            tags:
+                - UsersService
+            operationId: UsersService_UpdateTicket
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateTicketHttpRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateTicketResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/users:
+        put:
+            tags:
+                - UsersService
+            operationId: UsersService_EditInfo
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/EditInfoRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EditInfoResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
+        CreateTicketHttpRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+        CreateTicketResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+        DeleteTicketHttpRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+        DeleteTicketResponse:
+            type: object
+            properties: {}
         EditInfoRequest:
             type: object
             properties:
@@ -96,6 +236,11 @@ components:
         EditInfoResponse:
             type: object
             properties: {}
+        GetTicketHttpRequest:
+            type: object
+            properties:
+                id:
+                    type: string
         GoogleProtobufAny:
             type: object
             properties:
@@ -104,6 +249,20 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        ListTicketsHttpRequest:
+            type: object
+            properties:
+                pageNum:
+                    type: string
+                pageSize:
+                    type: string
+        ListTicketsResponse:
+            type: object
+            properties:
+                tickets:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Ticket'
         SignInRequest:
             type: object
             properties:
@@ -140,5 +299,28 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        Ticket:
+            type: object
+            properties:
+                id:
+                    type: string
+                authorId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        UpdateTicketHttpRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        UpdateTicketResponse:
+            type: object
+            properties: {}
 tags:
     - name: UsersService
