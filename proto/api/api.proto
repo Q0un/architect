@@ -12,14 +12,12 @@ service UsersService {
     rpc SignUp(SignUpRequest) returns (SignUpResponse) {
         option (google.api.http) = {
             post: "/api/signup"
-            body: "*"
         };
     }
 
     rpc SignIn(SignInRequest) returns (SignInResponse) {
         option (google.api.http) = {
-            post: "/api/signin"
-            body: "*"
+            get: "/api/signin"
         };
     }
 
@@ -32,36 +30,33 @@ service UsersService {
 
     rpc CreateTicket(CreateTicketHttpRequest) returns (CreateTicketResponse) {
         option (google.api.http) = {
-            put: "/api/create_ticket"
+            post: "/api/tickets"
             body: "*"
         };
     }
 
     rpc UpdateTicket(UpdateTicketHttpRequest) returns (UpdateTicketResponse) {
         option (google.api.http) = {
-            put: "/api/update_ticket"
+            put: "/api/tickets/{id}"
             body: "*"
         };
     }
 
     rpc DeleteTicket(DeleteTicketHttpRequest) returns (DeleteTicketResponse) {
         option (google.api.http) = {
-            put: "/api/delete_ticket"
-            body: "*"
+            delete: "/api/tickets/{id}"
         };
     }
 
     rpc GetTicket(GetTicketHttpRequest) returns (tickenator.Ticket) {
         option (google.api.http) = {
-            put: "/api/get_ticket"
-            body: "*"
+            get: "/api/tickets/{id}"
         };
     }
     
     rpc ListTickets(ListTicketsHttpRequest) returns (ListTicketsResponse) {
         option (google.api.http) = {
-            put: "/api/list_tickets"
-            body: "*"
+            get: "/api/tickets"
         };
     }
 }

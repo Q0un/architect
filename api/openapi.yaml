@@ -6,8 +6,88 @@ info:
     title: UsersService API
     version: 0.0.1
 paths:
-    /api/create_ticket:
-        put:
+    /api/signin:
+        get:
+            tags:
+                - UsersService
+            operationId: UsersService_SignIn
+            parameters:
+                - name: login
+                  in: query
+                  schema:
+                    type: string
+                - name: password
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SignInResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/signup:
+        post:
+            tags:
+                - UsersService
+            operationId: UsersService_SignUp
+            parameters:
+                - name: login
+                  in: query
+                  schema:
+                    type: string
+                - name: password
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SignUpResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/tickets:
+        get:
+            tags:
+                - UsersService
+            operationId: UsersService_ListTickets
+            parameters:
+                - name: pageNum
+                  in: query
+                  schema:
+                    type: string
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListTicketsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
             tags:
                 - UsersService
             operationId: UsersService_CreateTicket
@@ -30,41 +110,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/delete_ticket:
-        put:
-            tags:
-                - UsersService
-            operationId: UsersService_DeleteTicket
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/DeleteTicketHttpRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/DeleteTicketResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/get_ticket:
-        put:
+    /api/tickets/{id}:
+        get:
             tags:
                 - UsersService
             operationId: UsersService_GetTicket
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/GetTicketHttpRequest'
-                required: true
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -78,83 +134,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/list_tickets:
-        put:
-            tags:
-                - UsersService
-            operationId: UsersService_ListTickets
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/ListTicketsHttpRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ListTicketsResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/signin:
-        post:
-            tags:
-                - UsersService
-            operationId: UsersService_SignIn
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/SignInRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SignInResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/signup:
-        post:
-            tags:
-                - UsersService
-            operationId: UsersService_SignUp
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/SignUpRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SignUpResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/update_ticket:
         put:
             tags:
                 - UsersService
             operationId: UsersService_UpdateTicket
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
             requestBody:
                 content:
                     application/json:
@@ -168,6 +157,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateTicketResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - UsersService
+            operationId: UsersService_DeleteTicket
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteTicketResponse'
                 default:
                     description: Default error response
                     content:
@@ -212,11 +224,6 @@ components:
             properties:
                 id:
                     type: string
-        DeleteTicketHttpRequest:
-            type: object
-            properties:
-                id:
-                    type: string
         DeleteTicketResponse:
             type: object
             properties: {}
@@ -236,11 +243,6 @@ components:
         EditInfoResponse:
             type: object
             properties: {}
-        GetTicketHttpRequest:
-            type: object
-            properties:
-                id:
-                    type: string
         GoogleProtobufAny:
             type: object
             properties:
@@ -249,13 +251,6 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListTicketsHttpRequest:
-            type: object
-            properties:
-                pageNum:
-                    type: string
-                pageSize:
-                    type: string
         ListTicketsResponse:
             type: object
             properties:
@@ -263,23 +258,9 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Ticket'
-        SignInRequest:
-            type: object
-            properties:
-                login:
-                    type: string
-                password:
-                    type: string
         SignInResponse:
             type: object
             properties: {}
-        SignUpRequest:
-            type: object
-            properties:
-                login:
-                    type: string
-                password:
-                    type: string
         SignUpResponse:
             type: object
             properties: {}
