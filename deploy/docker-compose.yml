@@ -7,10 +7,34 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - 5001:5432
+      - 5010:5432
     volumes: 
       - db:/var/lib/postgresql/data
       - ../sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - common_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+  tickenator:
+    container_name: tickenator
+    build:
+      context: ../
+      dockerfile: ./build/tickenator/Dockerfile
+    image: tickenator
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 5001:5001
+    networks:
+      - common_network
+      - grpc_network
+    restart: unless-stopped
   users-api:
     container_name: users-api
     build:
@@ -18,11 +42,20 @@ services:
       dockerfile: ./build/users/Dockerfile
     image: users-api
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      tickenator:
+        condition: service_started
     ports:
       - 5000:5000
-    links:
-      - db
+    networks:
+      - common_network
+      - grpc_network
+    restart: unless-stopped
 volumes:
   db:
     driver: local
+networks:
+  common_network:
+  grpc_network:
+    driver: bridge

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -23,6 +24,7 @@ type UsersService struct {
 	db         *sqlx.DB
 	jwtPublic  *rsa.PublicKey
 	jwtPrivate *rsa.PrivateKey
+	tickenator *TickenatorClient
 }
 
 func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) {
@@ -30,22 +32,22 @@ func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) 
 		"postgres",
 		fmt.Sprintf(
 			"user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
-			config.DbUser,
-			config.DbPassword,
-			config.DbName,
-			config.DbHost,
-			config.DbPort,
+			config.Db.User,
+			config.Db.Password,
+			config.Db.Name,
+			config.Db.Host,
+			config.Db.Port,
 		),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	private, err := os.ReadFile(config.JwtPrivateFile)
+	private, err := os.ReadFile(config.Jwt.PrivateFile)
 	if err != nil {
 		return nil, err
 	}
-	public, err := os.ReadFile(config.JwtPublicFile)
+	public, err := os.ReadFile(config.Jwt.PublicFile)
 	if err != nil {
 		return nil, err
 	}
@@ -58,12 +60,18 @@ func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) 
 		return nil, err
 	}
 
+	tickenator, err := NewTickenatorClient(logger, config)
+	if err != nil {
+		return nil, err
+	}
+
 	return &UsersService{
 		logger:     logger,
 		config:     config,
 		db:         db,
 		jwtPublic:  jwtPublic,
 		jwtPrivate: jwtPrivate,
+		tickenator: tickenator,
 	}, nil
 }
 
@@ -83,21 +91,27 @@ func (service *UsersService) SignUp(ctx context.Context, req *api.SignUpRequest)
 		return "", fmt.Errorf("User with such login already exists")
 	}
 
+	tx := service.db.MustBegin()
+	var id uint64
+	err = tx.QueryRowx(
+		"INSERT INTO users (login, password) VALUES ($1, $2) RETURNING id",
+		req.GetLogin(),
+		md5Password(req.GetLogin(), req.GetPassword()),
+	).Scan(&id)
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("Cannot add user to database")
+	}
+	tx.Commit()
+	fmt.Println("signup:", id)
+
 	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"login": req.GetLogin(),
+		"id": strconv.FormatUint(id, 10),
 	})
 	token, err := t.SignedString(service.jwtPrivate)
 	if err != nil {
 		return "", err
 	}
-
-	tx := service.db.MustBegin()
-	tx.MustExec(
-		"INSERT INTO users (login, password) VALUES ($1, $2)",
-		req.GetLogin(),
-		md5Password(req.GetLogin(), req.GetPassword()),
-	)
-	tx.Commit()
 
 	return token, nil
 }
@@ -114,7 +128,7 @@ func (service *UsersService) SignIn(ctx context.Context, req *api.SignInRequest)
 	}
 
 	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"login": req.GetLogin(),
+		"id": user.Id,
 	})
 	token, err := t.SignedString(service.jwtPrivate)
 	if err != nil {
@@ -124,18 +138,9 @@ func (service *UsersService) SignIn(ctx context.Context, req *api.SignInRequest)
 	return token, nil
 }
 
-func (service *UsersService) EditInfo(ctx context.Context, req *api.EditInfoRequest, tokenStr string) error {
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return service.jwtPublic, nil
-	})
-	if err != nil || !token.Valid {
-		return fmt.Errorf("Bad auth header")
-	}
-
-	login := token.Claims.(jwt.MapClaims)["login"].(string)
-
+func (service *UsersService) EditInfo(ctx context.Context, req *api.EditInfoRequest, id uint64) error {
 	user := User{}
-	err = service.db.Get(&user, "SELECT * FROM users WHERE login=$1", login)
+	err := service.db.Get(&user, "SELECT * FROM users WHERE id=$1", id)
 	if err != nil {
 		return fmt.Errorf("Bad auth header")
 	}
@@ -169,4 +174,12 @@ func (service *UsersService) EditInfo(ctx context.Context, req *api.EditInfoRequ
 	}
 
 	return nil
+}
+
+func (service *UsersService) CheckUser(id uint64) bool {
+	user := User{}
+	fmt.Println("check:", id)
+	err := service.db.Get(&user, "SELECT * FROM users WHERE id=$1", id)
+	fmt.Println(err)
+	return err == nil
 }

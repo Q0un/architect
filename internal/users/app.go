@@ -29,7 +29,7 @@ func NewApp(logger *log.Logger, config *Config) (*App, error) {
 	app := &App{
 		logger:  logger,
 		config:  config,
-		api:     &API{logger: logger, service: service},
+		api:     &API{service: service},
 		service: service,
 	}
 

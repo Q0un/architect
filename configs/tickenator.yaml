@@ -1,0 +1,7 @@
+grpc_address: :5001
+db:
+  user: postgres
+  password: postgres
+  name: postgres
+  host: db
+  port: 5432

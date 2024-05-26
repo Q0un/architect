@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package tickenator;
+
+option go_package = "github.com/Q0un/architect/proto/tickenator";
+
+message Ticket {
+    uint64 id = 1;
+    uint64 author_id = 2;
+    string name = 3;
+    string description = 4;
+}

@@ -8,6 +8,7 @@ package api
 
 import (
 	context "context"
+	tickenator "github.com/Q0un/architect/proto/tickenator"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,9 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UsersService_SignUp_FullMethodName   = "/api.UsersService/SignUp"
-	UsersService_SignIn_FullMethodName   = "/api.UsersService/SignIn"
-	UsersService_EditInfo_FullMethodName = "/api.UsersService/EditInfo"
+	UsersService_SignUp_FullMethodName       = "/api.UsersService/SignUp"
+	UsersService_SignIn_FullMethodName       = "/api.UsersService/SignIn"
+	UsersService_EditInfo_FullMethodName     = "/api.UsersService/EditInfo"
+	UsersService_CreateTicket_FullMethodName = "/api.UsersService/CreateTicket"
+	UsersService_UpdateTicket_FullMethodName = "/api.UsersService/UpdateTicket"
+	UsersService_DeleteTicket_FullMethodName = "/api.UsersService/DeleteTicket"
+	UsersService_GetTicket_FullMethodName    = "/api.UsersService/GetTicket"
+	UsersService_ListTickets_FullMethodName  = "/api.UsersService/ListTickets"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -31,6 +37,11 @@ type UsersServiceClient interface {
 	SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error)
 	EditInfo(ctx context.Context, in *EditInfoRequest, opts ...grpc.CallOption) (*EditInfoResponse, error)
+	CreateTicket(ctx context.Context, in *CreateTicketHttpRequest, opts ...grpc.CallOption) (*CreateTicketResponse, error)
+	UpdateTicket(ctx context.Context, in *UpdateTicketHttpRequest, opts ...grpc.CallOption) (*UpdateTicketResponse, error)
+	DeleteTicket(ctx context.Context, in *DeleteTicketHttpRequest, opts ...grpc.CallOption) (*DeleteTicketResponse, error)
+	GetTicket(ctx context.Context, in *GetTicketHttpRequest, opts ...grpc.CallOption) (*tickenator.Ticket, error)
+	ListTickets(ctx context.Context, in *ListTicketsHttpRequest, opts ...grpc.CallOption) (*ListTicketsResponse, error)
 }
 
 type usersServiceClient struct {
@@ -68,6 +79,51 @@ func (c *usersServiceClient) EditInfo(ctx context.Context, in *EditInfoRequest, 
 	return out, nil
 }
 
+func (c *usersServiceClient) CreateTicket(ctx context.Context, in *CreateTicketHttpRequest, opts ...grpc.CallOption) (*CreateTicketResponse, error) {
+	out := new(CreateTicketResponse)
+	err := c.cc.Invoke(ctx, UsersService_CreateTicket_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) UpdateTicket(ctx context.Context, in *UpdateTicketHttpRequest, opts ...grpc.CallOption) (*UpdateTicketResponse, error) {
+	out := new(UpdateTicketResponse)
+	err := c.cc.Invoke(ctx, UsersService_UpdateTicket_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) DeleteTicket(ctx context.Context, in *DeleteTicketHttpRequest, opts ...grpc.CallOption) (*DeleteTicketResponse, error) {
+	out := new(DeleteTicketResponse)
+	err := c.cc.Invoke(ctx, UsersService_DeleteTicket_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) GetTicket(ctx context.Context, in *GetTicketHttpRequest, opts ...grpc.CallOption) (*tickenator.Ticket, error) {
+	out := new(tickenator.Ticket)
+	err := c.cc.Invoke(ctx, UsersService_GetTicket_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) ListTickets(ctx context.Context, in *ListTicketsHttpRequest, opts ...grpc.CallOption) (*ListTicketsResponse, error) {
+	out := new(ListTicketsResponse)
+	err := c.cc.Invoke(ctx, UsersService_ListTickets_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServiceServer is the server API for UsersService service.
 // All implementations must embed UnimplementedUsersServiceServer
 // for forward compatibility
@@ -75,6 +131,11 @@ type UsersServiceServer interface {
 	SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error)
 	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)
 	EditInfo(context.Context, *EditInfoRequest) (*EditInfoResponse, error)
+	CreateTicket(context.Context, *CreateTicketHttpRequest) (*CreateTicketResponse, error)
+	UpdateTicket(context.Context, *UpdateTicketHttpRequest) (*UpdateTicketResponse, error)
+	DeleteTicket(context.Context, *DeleteTicketHttpRequest) (*DeleteTicketResponse, error)
+	GetTicket(context.Context, *GetTicketHttpRequest) (*tickenator.Ticket, error)
+	ListTickets(context.Context, *ListTicketsHttpRequest) (*ListTicketsResponse, error)
 	mustEmbedUnimplementedUsersServiceServer()
 }
 
@@ -90,6 +151,21 @@ func (UnimplementedUsersServiceServer) SignIn(context.Context, *SignInRequest) (
 }
 func (UnimplementedUsersServiceServer) EditInfo(context.Context, *EditInfoRequest) (*EditInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditInfo not implemented")
+}
+func (UnimplementedUsersServiceServer) CreateTicket(context.Context, *CreateTicketHttpRequest) (*CreateTicketResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTicket not implemented")
+}
+func (UnimplementedUsersServiceServer) UpdateTicket(context.Context, *UpdateTicketHttpRequest) (*UpdateTicketResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTicket not implemented")
+}
+func (UnimplementedUsersServiceServer) DeleteTicket(context.Context, *DeleteTicketHttpRequest) (*DeleteTicketResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTicket not implemented")
+}
+func (UnimplementedUsersServiceServer) GetTicket(context.Context, *GetTicketHttpRequest) (*tickenator.Ticket, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTicket not implemented")
+}
+func (UnimplementedUsersServiceServer) ListTickets(context.Context, *ListTicketsHttpRequest) (*ListTicketsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTickets not implemented")
 }
 func (UnimplementedUsersServiceServer) mustEmbedUnimplementedUsersServiceServer() {}
 
@@ -158,6 +234,96 @@ func _UsersService_EditInfo_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UsersService_CreateTicket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTicketHttpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).CreateTicket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_CreateTicket_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).CreateTicket(ctx, req.(*CreateTicketHttpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_UpdateTicket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTicketHttpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).UpdateTicket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_UpdateTicket_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).UpdateTicket(ctx, req.(*UpdateTicketHttpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_DeleteTicket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTicketHttpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).DeleteTicket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_DeleteTicket_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).DeleteTicket(ctx, req.(*DeleteTicketHttpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_GetTicket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTicketHttpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).GetTicket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_GetTicket_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).GetTicket(ctx, req.(*GetTicketHttpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_ListTickets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTicketsHttpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).ListTickets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_ListTickets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).ListTickets(ctx, req.(*ListTicketsHttpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UsersService_ServiceDesc is the grpc.ServiceDesc for UsersService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +342,26 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EditInfo",
 			Handler:    _UsersService_EditInfo_Handler,
+		},
+		{
+			MethodName: "CreateTicket",
+			Handler:    _UsersService_CreateTicket_Handler,
+		},
+		{
+			MethodName: "UpdateTicket",
+			Handler:    _UsersService_UpdateTicket_Handler,
+		},
+		{
+			MethodName: "DeleteTicket",
+			Handler:    _UsersService_DeleteTicket_Handler,
+		},
+		{
+			MethodName: "GetTicket",
+			Handler:    _UsersService_GetTicket_Handler,
+		},
+		{
+			MethodName: "ListTickets",
+			Handler:    _UsersService_ListTickets_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

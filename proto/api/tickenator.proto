@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package api;
+
+import "tickenator/ticket.proto";
+
+option go_package = "proto/api";
+
+service TickenatorService {
+    rpc CreateTicket(CreateTicketRequest) returns (CreateTicketResponse) {}
+
+    rpc UpdateTicket(UpdateTicketRequest) returns (UpdateTicketResponse) {}
+
+    rpc DeleteTicket(DeleteTicketRequest) returns (DeleteTicketResponse) {}
+
+    rpc GetTicket(GetTicketRequest) returns (tickenator.Ticket) {}
+    
+    rpc ListTickets(ListTicketsRequest) returns (ListTicketsResponse) {}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message CreateTicketRequest {
+    uint64 user_id = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message CreateTicketResponse {
+    uint64 id = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message UpdateTicketRequest {
+    uint64 user_id = 1;
+    uint64 id = 2;
+    optional string name = 3;
+    optional string description = 4;
+}
+
+message UpdateTicketResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message DeleteTicketRequest {
+    uint64 user_id = 1;
+    uint64 id = 2;
+}
+
+message DeleteTicketResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message GetTicketRequest {
+    uint64 id = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message ListTicketsRequest {
+    uint64 page_num = 1;
+    uint64 page_size = 2;
+}
+
+message ListTicketsResponse {
+    repeated tickenator.Ticket tickets = 1;
+}

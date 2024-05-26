@@ -3,6 +3,8 @@ syntax = "proto3";
 package api;
 
 import "google/api/annotations.proto";
+import "tickenator/ticket.proto";
+import "api/tickenator.proto";
 
 option go_package = "proto/api";
 
@@ -10,14 +12,12 @@ service UsersService {
     rpc SignUp(SignUpRequest) returns (SignUpResponse) {
         option (google.api.http) = {
             post: "/api/signup"
-            body: "*"
         };
     }
 
     rpc SignIn(SignInRequest) returns (SignInResponse) {
         option (google.api.http) = {
-            post: "/api/signin"
-            body: "*"
+            get: "/api/signin"
         };
     }
 
@@ -25,6 +25,38 @@ service UsersService {
         option (google.api.http) = {
             put: "/api/users"
             body: "*"
+        };
+    }
+
+    rpc CreateTicket(CreateTicketHttpRequest) returns (CreateTicketResponse) {
+        option (google.api.http) = {
+            post: "/api/tickets"
+            body: "*"
+        };
+    }
+
+    rpc UpdateTicket(UpdateTicketHttpRequest) returns (UpdateTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/tickets/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteTicket(DeleteTicketHttpRequest) returns (DeleteTicketResponse) {
+        option (google.api.http) = {
+            delete: "/api/tickets/{id}"
+        };
+    }
+
+    rpc GetTicket(GetTicketHttpRequest) returns (tickenator.Ticket) {
+        option (google.api.http) = {
+            get: "/api/tickets/{id}"
+        };
+    }
+    
+    rpc ListTickets(ListTicketsHttpRequest) returns (ListTicketsResponse) {
+        option (google.api.http) = {
+            get: "/api/tickets"
         };
     }
 }
@@ -60,4 +92,38 @@ message EditInfoRequest {
 }
 
 message EditInfoResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message CreateTicketHttpRequest {
+    string name = 1;
+    string description = 2;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message UpdateTicketHttpRequest {
+    uint64 id = 1;
+    optional string name = 2;
+    optional string description = 3;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message DeleteTicketHttpRequest {
+    uint64 id = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message GetTicketHttpRequest {
+    uint64 id = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message ListTicketsHttpRequest {
+    uint64 page_num = 1;
+    uint64 page_size = 2;
 }
