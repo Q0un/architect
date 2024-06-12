@@ -2,7 +2,6 @@ version: '3.8'
 services:
   db:
     image: postgres:14.1-alpine
-    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -10,7 +9,7 @@ services:
       - 5010:5432
     volumes: 
       - db:/var/lib/postgresql/data
-      - ../sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../sql/init_postgres.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - common_network
     healthcheck:
@@ -20,6 +19,7 @@ services:
       retries: 5
       start_period: 10s
     restart: unless-stopped
+
   tickenator:
     container_name: tickenator
     build:
@@ -35,6 +35,7 @@ services:
       - common_network
       - grpc_network
     restart: unless-stopped
+
   users-api:
     container_name: users-api
     build:
@@ -52,8 +53,96 @@ services:
       - common_network
       - grpc_network
     restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    healthcheck:
+      test: nc -z localhost 5002 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 5002
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 5002:5002
+    restart: unless-stopped
+    networks:
+      - common_network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    healthcheck:
+      test: kafka-topics --bootstrap-server kafka:5003 --list
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - 5003:5003
+    hostname: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:5002
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:5003
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    restart: unless-stopped
+    networks:
+      - common_network
+
+  clickhouse:
+    image: yandex/clickhouse-server:latest
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 3
+    ports:
+      - "5004:8123" # HTTP interface
+      - "5005:9000" # native client
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse  # Persist data
+      - clickhouse_log:/var/log/clickhouse  # Log files
+      - ../sql/init_clickhouse.sql:/docker-entrypoint-initdb.d/init.sql
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped
+    networks:
+      - common_network
+  
+  stats:
+    container_name: stats
+    build:
+      context: ../
+      dockerfile: ./build/stats/Dockerfile
+    image: stats
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - 5006:5006
+    networks:
+      - common_network
+    restart: unless-stopped
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider localhost:5006/healthcheck || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 3
+
 volumes:
   db:
+    driver: local
+  clickhouse_data:
+    driver: local
+  clickhouse_log:
     driver: local
 networks:
   common_network:

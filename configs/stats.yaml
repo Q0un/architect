@@ -1,0 +1,8 @@
+http_address: :5006
+db:
+  user: default
+  name: default
+  host: clickhouse
+  port: 9000
+kafka:
+  host: kafka:5003

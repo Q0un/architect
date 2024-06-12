@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"crypto/rsa"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -12,19 +13,22 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/IBM/sarama"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
 	"github.com/Q0un/architect/proto/api"
+	"github.com/Q0un/architect/proto/stats"
 )
 
 type UsersService struct {
-	logger     *log.Logger
-	config     *Config
-	db         *sqlx.DB
-	jwtPublic  *rsa.PublicKey
-	jwtPrivate *rsa.PrivateKey
-	tickenator *TickenatorClient
+	logger        *log.Logger
+	config        *Config
+	db            *sqlx.DB
+	jwtPublic     *rsa.PublicKey
+	jwtPrivate    *rsa.PrivateKey
+	tickenator    *TickenatorClient
+	kafkaProducer sarama.SyncProducer
 }
 
 func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) {
@@ -65,14 +69,33 @@ func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) 
 		return nil, err
 	}
 
+	kafkaProducer, err := setupKafkaProducer(config)
+	if err != nil {
+		return nil, err
+	}
+
 	return &UsersService{
-		logger:     logger,
-		config:     config,
-		db:         db,
-		jwtPublic:  jwtPublic,
-		jwtPrivate: jwtPrivate,
-		tickenator: tickenator,
+		logger:        logger,
+		config:        config,
+		db:            db,
+		jwtPublic:     jwtPublic,
+		jwtPrivate:    jwtPrivate,
+		tickenator:    tickenator,
+		kafkaProducer: kafkaProducer,
 	}, nil
+}
+
+func setupKafkaProducer(config *Config) (sarama.SyncProducer, error) {
+	brokers := []string{config.Kafka.Host}
+
+	kafkaConfig := sarama.NewConfig()
+	kafkaConfig.Producer.Return.Successes = true
+
+	producer, err := sarama.NewSyncProducer(brokers, kafkaConfig)
+	if err != nil {
+		return nil, err
+	}
+	return producer, nil
 }
 
 func md5Password(login string, password string) string {
@@ -128,7 +151,7 @@ func (service *UsersService) SignIn(ctx context.Context, req *api.SignInRequest)
 	}
 
 	t := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"id": user.Id,
+		"id": strconv.FormatUint(user.Id, 10),
 	})
 	token, err := t.SignedString(service.jwtPrivate)
 	if err != nil {
@@ -182,4 +205,29 @@ func (service *UsersService) CheckUser(id uint64) bool {
 	err := service.db.Get(&user, "SELECT * FROM users WHERE id=$1", id)
 	fmt.Println(err)
 	return err == nil
+}
+
+func (service *UsersService) SendKafkaEvent(ctx context.Context, ticketId uint64, userId uint64, evType string) error {
+	ev := stats.StatsEvent{
+		TicketId: ticketId,
+		UserId: userId,
+		Type: evType,
+	}
+
+	jsonEvent, err := json.Marshal(ev)
+    if err != nil {
+        return fmt.Errorf("Failed to serialize message to JSON: %v", err)
+    }
+
+	message := &sarama.ProducerMessage{
+        Topic: "stats",
+        Key:   sarama.StringEncoder(evType),
+        Value: sarama.ByteEncoder(jsonEvent),
+    }
+
+    _, _, err = service.kafkaProducer.SendMessage(message)
+    if err != nil {
+        return fmt.Errorf("Failed to send message to kafka: %v", err)
+    }
+	return nil
 }

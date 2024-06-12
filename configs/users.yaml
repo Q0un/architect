@@ -9,3 +9,5 @@ jwt:
   private_file: rs256.rsa
   public_file: rs256.rsa.pub
 tickenator_host: tickenator:5001
+kafka:
+  host: kafka:5003

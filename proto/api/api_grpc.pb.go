@@ -28,6 +28,8 @@ const (
 	UsersService_DeleteTicket_FullMethodName = "/api.UsersService/DeleteTicket"
 	UsersService_GetTicket_FullMethodName    = "/api.UsersService/GetTicket"
 	UsersService_ListTickets_FullMethodName  = "/api.UsersService/ListTickets"
+	UsersService_ViewTicket_FullMethodName   = "/api.UsersService/ViewTicket"
+	UsersService_LikeTicket_FullMethodName   = "/api.UsersService/LikeTicket"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -42,6 +44,8 @@ type UsersServiceClient interface {
 	DeleteTicket(ctx context.Context, in *DeleteTicketHttpRequest, opts ...grpc.CallOption) (*DeleteTicketResponse, error)
 	GetTicket(ctx context.Context, in *GetTicketHttpRequest, opts ...grpc.CallOption) (*tickenator.Ticket, error)
 	ListTickets(ctx context.Context, in *ListTicketsHttpRequest, opts ...grpc.CallOption) (*ListTicketsResponse, error)
+	ViewTicket(ctx context.Context, in *ViewTicketRequest, opts ...grpc.CallOption) (*ViewTicketResponse, error)
+	LikeTicket(ctx context.Context, in *LikeTicketRequest, opts ...grpc.CallOption) (*LikeTicketResponse, error)
 }
 
 type usersServiceClient struct {
@@ -124,6 +128,24 @@ func (c *usersServiceClient) ListTickets(ctx context.Context, in *ListTicketsHtt
 	return out, nil
 }
 
+func (c *usersServiceClient) ViewTicket(ctx context.Context, in *ViewTicketRequest, opts ...grpc.CallOption) (*ViewTicketResponse, error) {
+	out := new(ViewTicketResponse)
+	err := c.cc.Invoke(ctx, UsersService_ViewTicket_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) LikeTicket(ctx context.Context, in *LikeTicketRequest, opts ...grpc.CallOption) (*LikeTicketResponse, error) {
+	out := new(LikeTicketResponse)
+	err := c.cc.Invoke(ctx, UsersService_LikeTicket_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersServiceServer is the server API for UsersService service.
 // All implementations must embed UnimplementedUsersServiceServer
 // for forward compatibility
@@ -136,6 +158,8 @@ type UsersServiceServer interface {
 	DeleteTicket(context.Context, *DeleteTicketHttpRequest) (*DeleteTicketResponse, error)
 	GetTicket(context.Context, *GetTicketHttpRequest) (*tickenator.Ticket, error)
 	ListTickets(context.Context, *ListTicketsHttpRequest) (*ListTicketsResponse, error)
+	ViewTicket(context.Context, *ViewTicketRequest) (*ViewTicketResponse, error)
+	LikeTicket(context.Context, *LikeTicketRequest) (*LikeTicketResponse, error)
 	mustEmbedUnimplementedUsersServiceServer()
 }
 
@@ -166,6 +190,12 @@ func (UnimplementedUsersServiceServer) GetTicket(context.Context, *GetTicketHttp
 }
 func (UnimplementedUsersServiceServer) ListTickets(context.Context, *ListTicketsHttpRequest) (*ListTicketsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTickets not implemented")
+}
+func (UnimplementedUsersServiceServer) ViewTicket(context.Context, *ViewTicketRequest) (*ViewTicketResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ViewTicket not implemented")
+}
+func (UnimplementedUsersServiceServer) LikeTicket(context.Context, *LikeTicketRequest) (*LikeTicketResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LikeTicket not implemented")
 }
 func (UnimplementedUsersServiceServer) mustEmbedUnimplementedUsersServiceServer() {}
 
@@ -324,6 +354,42 @@ func _UsersService_ListTickets_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UsersService_ViewTicket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ViewTicketRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).ViewTicket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_ViewTicket_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).ViewTicket(ctx, req.(*ViewTicketRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_LikeTicket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikeTicketRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).LikeTicket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_LikeTicket_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).LikeTicket(ctx, req.(*LikeTicketRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UsersService_ServiceDesc is the grpc.ServiceDesc for UsersService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -362,6 +428,14 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListTickets",
 			Handler:    _UsersService_ListTickets_Handler,
+		},
+		{
+			MethodName: "ViewTicket",
+			Handler:    _UsersService_ViewTicket_Handler,
+		},
+		{
+			MethodName: "LikeTicket",
+			Handler:    _UsersService_LikeTicket_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

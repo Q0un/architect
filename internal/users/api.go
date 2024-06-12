@@ -188,12 +188,48 @@ func (a *API) ListTickets(ctx context.Context, req *api.ListTicketsHttpRequest) 
 		return nil, fmt.Errorf("Bad auth header")
 	}
 	return a.service.tickenator.ListTickets(
-		ctx, 
+		ctx,
 		&api.ListTicketsRequest{
 			PageNum:  req.PageNum,
 			PageSize: req.PageSize,
 		},
 	)
+}
+
+// ViewTicket implements api.TickenatorServiceServer
+func (a *API) ViewTicket(ctx context.Context, req *api.ViewTicketRequest) (*api.ViewTicketResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+
+	err = a.service.SendKafkaEvent(ctx, req.GetId(), id, "view")
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.ViewTicketResponse{}, nil
+}
+
+// LikeTicket implements api.TickenatorServiceServer
+func (a *API) LikeTicket(ctx context.Context, req *api.LikeTicketRequest) (*api.LikeTicketResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+
+	err = a.service.SendKafkaEvent(ctx, req.GetId(), id, "like")
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.LikeTicketResponse{}, nil
 }
 
 func (a *API) Mount(router chi.Router) {

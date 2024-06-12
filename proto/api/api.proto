@@ -59,6 +59,20 @@ service UsersService {
             get: "/api/tickets"
         };
     }
+
+    rpc ViewTicket(ViewTicketRequest) returns (ViewTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/tickets/view"
+            body: "*"
+        };
+    }
+
+    rpc LikeTicket(LikeTicketRequest) returns (LikeTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/tickets/like"
+            body: "*"
+        };
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,4 +140,22 @@ message GetTicketHttpRequest {
 message ListTicketsHttpRequest {
     uint64 page_num = 1;
     uint64 page_size = 2;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message ViewTicketRequest {
+    uint64 id = 1;
+}
+
+message ViewTicketResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message LikeTicketRequest {
+    uint64 id = 1;
+}
+
+message LikeTicketResponse {
 }
