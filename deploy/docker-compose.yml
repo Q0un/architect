@@ -47,6 +47,8 @@ services:
         condition: service_healthy
       tickenator:
         condition: service_started
+      kafka:
+        condition: service_healthy
     ports:
       - 5000:5000
     networks:
