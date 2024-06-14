@@ -145,40 +145,48 @@ func (service *StatsService) TicketStats(ticket_id uint64) (uint64, uint64, erro
 	return views, likes, nil
 }
 
-func (service *StatsService) TopTickets(evType string) ([]uint64, error) {
-	query := fmt.Sprintf("SELECT ticket_id FROM stats GROUP BY ticket_id ORDER BY uniqExactIf(user_id, type = '%s') DESC LIMIT 5", evType)
+func (service *StatsService) TopTickets(evType string) ([]*stats.TicketInfo, error) {
+	query := fmt.Sprintf("SELECT ticket_id, uniqExactIf(user_id, type = '%s') AS stat FROM stats GROUP BY ticket_id ORDER BY stat DESC LIMIT 5", evType)
 	rows, err := service.db.Query(context.Background(), query)
 	if err != nil {
-		return []uint64{}, err
+		return []*stats.TicketInfo{}, err
 	}
 
-	var tickets []uint64
+	var top []*stats.TicketInfo
 	for rows.Next() {
-		var ticket_id uint64
-		err = rows.Scan(&ticket_id)
+		var ticketId uint64
+		var count uint64
+		err = rows.Scan(&ticketId, &count)
 		if err != nil {
-			return []uint64{}, err
+			return []*stats.TicketInfo{}, err
 		}
-		tickets = append(tickets, ticket_id)
+		top = append(top, &stats.TicketInfo{
+			TicketId: ticketId,
+			Count: count,
+		})
 	}
-	return tickets, nil
+	return top, nil
 }
 
-func (service *StatsService) TopUsers() ([]uint64, error) {
-	query := "SELECT user_id FROM stats GROUP BY user_id ORDER BY uniqExactIf(ticket_id, type = 'like') DESC LIMIT 3"
+func (service *StatsService) TopUsers() ([]*stats.UserInfo, error) {
+	query := "SELECT user_id, uniqExactIf(ticket_id, type = 'like') AS likes FROM stats GROUP BY user_id ORDER BY likes DESC LIMIT 3"
 	rows, err := service.db.Query(context.Background(), query)
 	if err != nil {
-		return []uint64{}, err
+		return []*stats.UserInfo{}, err
 	}
 
-	var users []uint64
+	var top []*stats.UserInfo
 	for rows.Next() {
-		var user_id uint64
-		err = rows.Scan(&user_id)
+		var userId uint64
+		var likes uint64
+		err = rows.Scan(&userId, &likes)
 		if err != nil {
-			return []uint64{}, err
+			return []*stats.UserInfo{}, err
 		}
-		users = append(users, user_id)
+		top = append(top, &stats.UserInfo{
+			UserId: userId,
+			Likes: likes,
+		})
 	}
-	return users, nil
+	return top, nil
 }

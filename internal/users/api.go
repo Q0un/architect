@@ -255,7 +255,26 @@ func (a *API) TopTickets(ctx context.Context, req *api.TopTicketsRequest) (*api.
 		return nil, fmt.Errorf("Bad auth header")
 	}
 
-	return a.service.stats.TopTickets(ctx, req)
+	resp, err := a.service.stats.TopTickets(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, info := range resp.GetTop() {
+		ticket, err := a.service.tickenator.GetTicket(
+			ctx,
+			&api.GetTicketRequest{
+				Id: info.GetTicketId(),
+			},
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		info.AuthorId = ticket.GetAuthorId()
+	}
+
+	return resp, nil
 }
 
 // TopUsers implements api.UsersServiceServer

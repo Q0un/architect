@@ -83,6 +83,124 @@ func (x *StatsEvent) GetType() string {
 	return ""
 }
 
+type TicketInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TicketId uint64 `protobuf:"varint,1,opt,name=ticket_id,json=ticketId,proto3" json:"ticket_id,omitempty" db:"ticket_id"`
+	AuthorId uint64 `protobuf:"varint,2,opt,name=author_id,json=authorId,proto3" json:"author_id,omitempty" db:"author_id"`
+	Count    uint64 `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty" db:"count"`
+}
+
+func (x *TicketInfo) Reset() {
+	*x = TicketInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_stats_stats_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TicketInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TicketInfo) ProtoMessage() {}
+
+func (x *TicketInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_stats_stats_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TicketInfo.ProtoReflect.Descriptor instead.
+func (*TicketInfo) Descriptor() ([]byte, []int) {
+	return file_stats_stats_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TicketInfo) GetTicketId() uint64 {
+	if x != nil {
+		return x.TicketId
+	}
+	return 0
+}
+
+func (x *TicketInfo) GetAuthorId() uint64 {
+	if x != nil {
+		return x.AuthorId
+	}
+	return 0
+}
+
+func (x *TicketInfo) GetCount() uint64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type UserInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId uint64 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" db:"user_id"`
+	Likes  uint64 `protobuf:"varint,2,opt,name=likes,proto3" json:"likes,omitempty" db:"likes"`
+}
+
+func (x *UserInfo) Reset() {
+	*x = UserInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_stats_stats_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserInfo) ProtoMessage() {}
+
+func (x *UserInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_stats_stats_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
+func (*UserInfo) Descriptor() ([]byte, []int) {
+	return file_stats_stats_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UserInfo) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *UserInfo) GetLikes() uint64 {
+	if x != nil {
+		return x.Likes
+	}
+	return 0
+}
+
 var File_stats_stats_proto protoreflect.FileDescriptor
 
 var file_stats_stats_proto_rawDesc = []byte{
@@ -93,10 +211,19 @@ var file_stats_stats_proto_rawDesc = []byte{
 	0x6b, 0x65, 0x74, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64,
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x12,
 	0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79,
-	0x70, 0x65, 0x42, 0x27, 0x5a, 0x25, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x51, 0x30, 0x75, 0x6e, 0x2f, 0x61, 0x72, 0x63, 0x68, 0x69, 0x74, 0x65, 0x63, 0x74, 0x2f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x70, 0x65, 0x22, 0x5c, 0x0a, 0x0a, 0x54, 0x69, 0x63, 0x6b, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x6f,
+	0x12, 0x1b, 0x0a, 0x09, 0x74, 0x69, 0x63, 0x6b, 0x65, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x08, 0x74, 0x69, 0x63, 0x6b, 0x65, 0x74, 0x49, 0x64, 0x12, 0x1b, 0x0a,
+	0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x08, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f,
+	0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74,
+	0x22, 0x39, 0x0a, 0x08, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x17, 0x0a, 0x07,
+	0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x75,
+	0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6b, 0x65, 0x73, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x6c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x27, 0x5a, 0x25, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x51, 0x30, 0x75, 0x6e, 0x2f, 0x61,
+	0x72, 0x63, 0x68, 0x69, 0x74, 0x65, 0x63, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x73,
+	0x74, 0x61, 0x74, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -111,9 +238,11 @@ func file_stats_stats_proto_rawDescGZIP() []byte {
 	return file_stats_stats_proto_rawDescData
 }
 
-var file_stats_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_stats_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_stats_stats_proto_goTypes = []interface{}{
 	(*StatsEvent)(nil), // 0: stats.StatsEvent
+	(*TicketInfo)(nil), // 1: stats.TicketInfo
+	(*UserInfo)(nil),   // 2: stats.UserInfo
 }
 var file_stats_stats_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -141,6 +270,30 @@ func file_stats_stats_proto_init() {
 				return nil
 			}
 		}
+		file_stats_stats_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TicketInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_stats_stats_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -148,7 +301,7 @@ func file_stats_stats_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_stats_stats_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

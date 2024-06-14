@@ -3,6 +3,7 @@ syntax = "proto3";
 package api;
 
 import "google/api/annotations.proto";
+import "stats/stats.proto";
 
 option go_package = "proto/api";
 
@@ -49,7 +50,7 @@ message TopTicketsRequest {
 }
 
 message TopTicketsResponse {
-    repeated uint64 tickets = 1;
+    repeated stats.TicketInfo top = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,5 +59,5 @@ message TopUsersRequest {
 }
 
 message TopUsersResponse {
-    repeated uint64 users = 1;
+    repeated stats.UserInfo top = 1;
 }

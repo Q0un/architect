@@ -34,25 +34,25 @@ func (a *API) TicketStats(ctx context.Context, req *api.TicketStatsRequest) (*ap
 
 // TopTickets implements api.StatsServiceServer
 func (a *API) TopTickets(ctx context.Context, req *api.TopTicketsRequest) (*api.TopTicketsResponse, error) {
-	tickets, err := a.service.TopTickets(req.GetType())
+	top, err := a.service.TopTickets(req.GetType())
 	if err != nil {
 		return nil, err
 	}
 
 	return &api.TopTicketsResponse{
-		Tickets: tickets,
+		Top: top,
 	}, nil
 }
 
 // TopUsers implements api.StatsServiceServer
 func (a *API) TopUsers(ctx context.Context, req *api.TopUsersRequest) (*api.TopUsersResponse, error) {
-	users, err := a.service.TopUsers()
+	top, err := a.service.TopUsers()
 	if err != nil {
 		return nil, err
 	}
 
 	return &api.TopUsersResponse{
-		Users: users,
+		Top: top,
 	}, nil
 }
 
