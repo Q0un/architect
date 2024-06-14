@@ -113,3 +113,72 @@ func (service *StatsService) addToDb(event *stats.StatsEvent) error {
 
 	return nil
 }
+
+
+func (service *StatsService) TicketStats(ticket_id uint64) (uint64, uint64, error) {
+	query := fmt.Sprintf("SELECT uniqExactIf(user_id, type = 'view' AND ticket_id = %d) FROM stats", ticket_id)
+	row, err := service.db.Query(context.Background(), query)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	var views uint64
+	row.Next()
+	err = row.Scan(&views)
+	if err != nil {
+		return 0, 0, err
+	}
+	
+	query = fmt.Sprintf("SELECT uniqExactIf(user_id, type = 'like' AND ticket_id = %d) FROM stats", ticket_id)
+	row, err = service.db.Query(context.Background(), query)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	var likes uint64
+	row.Next()
+	err = row.Scan(&likes)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return views, likes, nil
+}
+
+func (service *StatsService) TopTickets(evType string) ([]uint64, error) {
+	query := fmt.Sprintf("SELECT ticket_id FROM stats GROUP BY ticket_id ORDER BY uniqExactIf(user_id, type = '%s') DESC LIMIT 5", evType)
+	rows, err := service.db.Query(context.Background(), query)
+	if err != nil {
+		return []uint64{}, err
+	}
+
+	var tickets []uint64
+	for rows.Next() {
+		var ticket_id uint64
+		err = rows.Scan(&ticket_id)
+		if err != nil {
+			return []uint64{}, err
+		}
+		tickets = append(tickets, ticket_id)
+	}
+	return tickets, nil
+}
+
+func (service *StatsService) TopUsers() ([]uint64, error) {
+	query := "SELECT user_id FROM stats GROUP BY user_id ORDER BY uniqExactIf(ticket_id, type = 'like') DESC LIMIT 3"
+	rows, err := service.db.Query(context.Background(), query)
+	if err != nil {
+		return []uint64{}, err
+	}
+
+	var users []uint64
+	for rows.Next() {
+		var user_id uint64
+		err = rows.Scan(&user_id)
+		if err != nil {
+			return []uint64{}, err
+		}
+		users = append(users, user_id)
+	}
+	return users, nil
+}

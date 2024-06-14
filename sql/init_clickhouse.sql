@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS stats (
-    user_id BIGINT,
-    ticket_id BIGINT,
+    user_id UInt64,
+    ticket_id UInt64,
     type TEXT
 )
 ENGINE = MergeTree()

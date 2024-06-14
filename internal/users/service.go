@@ -29,6 +29,7 @@ type UsersService struct {
 	jwtPrivate    *rsa.PrivateKey
 	tickenator    *TickenatorClient
 	kafkaProducer sarama.SyncProducer
+	stats         *StatsClient
 }
 
 func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) {
@@ -74,6 +75,8 @@ func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) 
 		return nil, err
 	}
 
+	stats, err := NewStatsClient(logger, config)
+
 	return &UsersService{
 		logger:        logger,
 		config:        config,
@@ -82,6 +85,7 @@ func NewUsersService(logger *log.Logger, config *Config) (*UsersService, error) 
 		jwtPrivate:    jwtPrivate,
 		tickenator:    tickenator,
 		kafkaProducer: kafkaProducer,
+		stats:         stats,
 	}, nil
 }
 

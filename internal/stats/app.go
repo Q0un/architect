@@ -2,12 +2,17 @@ package stats
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc"
+
+	"github.com/Q0un/architect/proto/api"
 )
 
 type App struct {
@@ -64,6 +69,9 @@ func (app *App) Run(ctx context.Context) error {
 		return app.RunHTTPServer(ctx)
 	})
 	g.Go(func() error {
+		return app.RunGRPCServer(ctx)
+	})
+	g.Go(func() error {
 		return app.service.runKafkaConsumer(ctx)
 	})
 
@@ -74,4 +82,21 @@ func (app *App) RunHTTPServer(ctx context.Context) error {
 	app.logger.Println("Starting http server at", app.config.HttpAddress)
 	server := &http.Server{Addr: app.config.HttpAddress, Handler: app.router}
 	return server.ListenAndServe()
+}
+
+func (app *App) RunGRPCServer(ctx context.Context) error {
+	app.logger.Println("Starting grpc server at:", app.config.GrpcAddress)
+	server := grpc.NewServer()
+	api.RegisterStatsServiceServer(server, app.api)
+
+	listen, err := net.Listen("tcp", app.config.GrpcAddress)
+	if err != nil {
+		return fmt.Errorf("failed to listen grpc server socket: %w", err)
+	}
+
+	if err = server.Serve(listen); err != nil {
+		return fmt.Errorf("grpc server failed: %w", err)
+	}
+
+	return nil
 }

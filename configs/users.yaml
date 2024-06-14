@@ -11,3 +11,4 @@ jwt:
 tickenator_host: tickenator:5001
 kafka:
   host: kafka:5003
+stats_host: stats:5007

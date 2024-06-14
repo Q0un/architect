@@ -49,6 +49,8 @@ services:
         condition: service_started
       kafka:
         condition: service_healthy
+      stats:
+        condition: service_healthy
     ports:
       - 5000:5000
     networks:
@@ -130,8 +132,10 @@ services:
         condition: service_healthy
     ports:
       - 5006:5006
+      - 5007:5007
     networks:
       - common_network
+      - grpc_network
     restart: unless-stopped
     healthcheck:
       test: wget --no-verbose --tries=1 --spider localhost:5006/healthcheck || exit 1

@@ -12,6 +12,15 @@ service StatsService {
             get: "/healthcheck"
         };
     }
+
+    rpc TicketStats(TicketStatsRequest) returns (TicketStatsResponse) {
+    }
+
+    rpc TopTickets(TopTicketsRequest) returns (TopTicketsResponse) {
+    }
+
+    rpc TopUsers(TopUsersRequest) returns (TopUsersResponse) {
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,4 +29,34 @@ message HealthCheckRequest {
 }
 
 message HealthCheckResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message TicketStatsRequest {
+    uint64 id = 1;
+}
+
+message TicketStatsResponse {
+    uint64 views = 1;
+    uint64 likes = 2;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message TopTicketsRequest {
+    string type = 1;
+}
+
+message TopTicketsResponse {
+    repeated uint64 tickets = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message TopUsersRequest {
+}
+
+message TopUsersResponse {
+    repeated uint64 users = 1;
 }

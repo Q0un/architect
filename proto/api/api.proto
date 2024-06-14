@@ -5,6 +5,7 @@ package api;
 import "google/api/annotations.proto";
 import "tickenator/ticket.proto";
 import "api/tickenator.proto";
+import "api/stats.proto";
 
 option go_package = "proto/api";
 
@@ -71,6 +72,24 @@ service UsersService {
         option (google.api.http) = {
             put: "/api/tickets/like"
             body: "*"
+        };
+    }
+
+    rpc TicketStats(TicketStatsRequest) returns (TicketStatsResponse) {
+        option (google.api.http) = {
+            get: "/api/tickets/stats/{id}"
+        };
+    }
+
+    rpc TopTickets(TopTicketsRequest) returns (TopTicketsResponse) {
+        option (google.api.http) = {
+            get: "/api/tickets/stats/top_tickets"
+        };
+    }
+
+    rpc TopUsers(TopUsersRequest) returns (TopUsersResponse) {
+        option (google.api.http) = {
+            get: "/api/tickets/stats/top_users"
         };
     }
 }

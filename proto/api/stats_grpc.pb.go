@@ -20,6 +20,9 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	StatsService_HealthCheck_FullMethodName = "/api.StatsService/HealthCheck"
+	StatsService_TicketStats_FullMethodName = "/api.StatsService/TicketStats"
+	StatsService_TopTickets_FullMethodName  = "/api.StatsService/TopTickets"
+	StatsService_TopUsers_FullMethodName    = "/api.StatsService/TopUsers"
 )
 
 // StatsServiceClient is the client API for StatsService service.
@@ -27,6 +30,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StatsServiceClient interface {
 	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
+	TicketStats(ctx context.Context, in *TicketStatsRequest, opts ...grpc.CallOption) (*TicketStatsResponse, error)
+	TopTickets(ctx context.Context, in *TopTicketsRequest, opts ...grpc.CallOption) (*TopTicketsResponse, error)
+	TopUsers(ctx context.Context, in *TopUsersRequest, opts ...grpc.CallOption) (*TopUsersResponse, error)
 }
 
 type statsServiceClient struct {
@@ -46,11 +52,41 @@ func (c *statsServiceClient) HealthCheck(ctx context.Context, in *HealthCheckReq
 	return out, nil
 }
 
+func (c *statsServiceClient) TicketStats(ctx context.Context, in *TicketStatsRequest, opts ...grpc.CallOption) (*TicketStatsResponse, error) {
+	out := new(TicketStatsResponse)
+	err := c.cc.Invoke(ctx, StatsService_TicketStats_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *statsServiceClient) TopTickets(ctx context.Context, in *TopTicketsRequest, opts ...grpc.CallOption) (*TopTicketsResponse, error) {
+	out := new(TopTicketsResponse)
+	err := c.cc.Invoke(ctx, StatsService_TopTickets_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *statsServiceClient) TopUsers(ctx context.Context, in *TopUsersRequest, opts ...grpc.CallOption) (*TopUsersResponse, error) {
+	out := new(TopUsersResponse)
+	err := c.cc.Invoke(ctx, StatsService_TopUsers_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StatsServiceServer is the server API for StatsService service.
 // All implementations must embed UnimplementedStatsServiceServer
 // for forward compatibility
 type StatsServiceServer interface {
 	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
+	TicketStats(context.Context, *TicketStatsRequest) (*TicketStatsResponse, error)
+	TopTickets(context.Context, *TopTicketsRequest) (*TopTicketsResponse, error)
+	TopUsers(context.Context, *TopUsersRequest) (*TopUsersResponse, error)
 	mustEmbedUnimplementedStatsServiceServer()
 }
 
@@ -60,6 +96,15 @@ type UnimplementedStatsServiceServer struct {
 
 func (UnimplementedStatsServiceServer) HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
+}
+func (UnimplementedStatsServiceServer) TicketStats(context.Context, *TicketStatsRequest) (*TicketStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TicketStats not implemented")
+}
+func (UnimplementedStatsServiceServer) TopTickets(context.Context, *TopTicketsRequest) (*TopTicketsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TopTickets not implemented")
+}
+func (UnimplementedStatsServiceServer) TopUsers(context.Context, *TopUsersRequest) (*TopUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TopUsers not implemented")
 }
 func (UnimplementedStatsServiceServer) mustEmbedUnimplementedStatsServiceServer() {}
 
@@ -92,6 +137,60 @@ func _StatsService_HealthCheck_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StatsService_TicketStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TicketStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatsServiceServer).TicketStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatsService_TicketStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatsServiceServer).TicketStats(ctx, req.(*TicketStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StatsService_TopTickets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TopTicketsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatsServiceServer).TopTickets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatsService_TopTickets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatsServiceServer).TopTickets(ctx, req.(*TopTicketsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StatsService_TopUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TopUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatsServiceServer).TopUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StatsService_TopUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatsServiceServer).TopUsers(ctx, req.(*TopUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StatsService_ServiceDesc is the grpc.ServiceDesc for StatsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +201,18 @@ var StatsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "HealthCheck",
 			Handler:    _StatsService_HealthCheck_Handler,
+		},
+		{
+			MethodName: "TicketStats",
+			Handler:    _StatsService_TicketStats_Handler,
+		},
+		{
+			MethodName: "TopTickets",
+			Handler:    _StatsService_TopTickets_Handler,
+		},
+		{
+			MethodName: "TopUsers",
+			Handler:    _StatsService_TopUsers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

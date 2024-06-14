@@ -1,4 +1,5 @@
 http_address: :5006
+grpc_address: :5007
 db:
   user: default
   name: default

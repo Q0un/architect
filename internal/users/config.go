@@ -31,6 +31,7 @@ type Config struct {
 	Jwt            JwtConfig   `yaml:"jwt"`
 	TickenatorHost string      `yaml:"tickenator_host"`
 	Kafka          KafkaConfig `yaml:"kafka"`
+	StatsHost      string      `yaml:"stats_host"`
 }
 
 func LoadConfig(path string) (*Config, error) {
