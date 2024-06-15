@@ -5,6 +5,7 @@ package api;
 import "google/api/annotations.proto";
 import "tickenator/ticket.proto";
 import "api/tickenator.proto";
+import "api/stats.proto";
 
 option go_package = "proto/api";
 
@@ -57,6 +58,38 @@ service UsersService {
     rpc ListTickets(ListTicketsHttpRequest) returns (ListTicketsResponse) {
         option (google.api.http) = {
             get: "/api/tickets"
+        };
+    }
+
+    rpc ViewTicket(ViewTicketRequest) returns (ViewTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/tickets/view"
+            body: "*"
+        };
+    }
+
+    rpc LikeTicket(LikeTicketRequest) returns (LikeTicketResponse) {
+        option (google.api.http) = {
+            put: "/api/tickets/like"
+            body: "*"
+        };
+    }
+
+    rpc TicketStats(TicketStatsRequest) returns (TicketStatsResponse) {
+        option (google.api.http) = {
+            get: "/api/tickets/stats/{id}"
+        };
+    }
+
+    rpc TopTickets(TopTicketsRequest) returns (TopTicketsResponse) {
+        option (google.api.http) = {
+            get: "/api/tickets/stats/top_tickets"
+        };
+    }
+
+    rpc TopUsers(TopUsersRequest) returns (TopUsersResponse) {
+        option (google.api.http) = {
+            get: "/api/tickets/stats/top_users"
         };
     }
 }
@@ -126,4 +159,22 @@ message GetTicketHttpRequest {
 message ListTicketsHttpRequest {
     uint64 page_num = 1;
     uint64 page_size = 2;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message ViewTicketRequest {
+    uint64 id = 1;
+}
+
+message ViewTicketResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message LikeTicketRequest {
+    uint64 id = 1;
+}
+
+message LikeTicketResponse {
 }

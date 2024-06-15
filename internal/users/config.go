@@ -20,12 +20,18 @@ type JwtConfig struct {
 	PublicFile  string `yaml:"public_file"`
 }
 
+type KafkaConfig struct {
+	Host string `yaml:"host"`
+}
+
 type Config struct {
-	HttpAddress    string    `yaml:"http_address"`
-	LogFile        string    `yaml:"log_file"`
-	Db             DbConfig  `yaml:"db"`
-	Jwt            JwtConfig `yaml:"jwt"`
-	TickenatorHost string    `yaml:"tickenator_host"`
+	HttpAddress    string      `yaml:"http_address"`
+	LogFile        string      `yaml:"log_file"`
+	Db             DbConfig    `yaml:"db"`
+	Jwt            JwtConfig   `yaml:"jwt"`
+	TickenatorHost string      `yaml:"tickenator_host"`
+	Kafka          KafkaConfig `yaml:"kafka"`
+	StatsHost      string      `yaml:"stats_host"`
 }
 
 func LoadConfig(path string) (*Config, error) {

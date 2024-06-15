@@ -104,7 +104,7 @@ func (a *API) EditInfo(ctx context.Context, req *api.EditInfoRequest) (*api.Edit
 	return &api.EditInfoResponse{}, a.service.EditInfo(ctx, req, id)
 }
 
-// CreateTicket implements api.TickenatorServiceServer
+// CreateTicket implements api.UsersServiceServer
 func (a *API) CreateTicket(ctx context.Context, req *api.CreateTicketHttpRequest) (*api.CreateTicketResponse, error) {
 	id, err := a.getUserId(ctx)
 	if err != nil {
@@ -123,7 +123,7 @@ func (a *API) CreateTicket(ctx context.Context, req *api.CreateTicketHttpRequest
 	)
 }
 
-// UpdateTicket implements api.TickenatorServiceServer
+// UpdateTicket implements api.UsersServiceServer
 func (a *API) UpdateTicket(ctx context.Context, req *api.UpdateTicketHttpRequest) (*api.UpdateTicketResponse, error) {
 	id, err := a.getUserId(ctx)
 	if err != nil {
@@ -143,7 +143,7 @@ func (a *API) UpdateTicket(ctx context.Context, req *api.UpdateTicketHttpRequest
 	)
 }
 
-// DeleteTicket implements api.TickenatorServiceServer
+// DeleteTicket implements api.UsersServiceServer
 func (a *API) DeleteTicket(ctx context.Context, req *api.DeleteTicketHttpRequest) (*api.DeleteTicketResponse, error) {
 	id, err := a.getUserId(ctx)
 	if err != nil {
@@ -161,7 +161,7 @@ func (a *API) DeleteTicket(ctx context.Context, req *api.DeleteTicketHttpRequest
 	)
 }
 
-// GetTicket implements api.TickenatorServiceServer
+// GetTicket implements api.UsersServiceServer
 func (a *API) GetTicket(ctx context.Context, req *api.GetTicketHttpRequest) (*proto.Ticket, error) {
 	id, err := a.getUserId(ctx)
 	if err != nil {
@@ -178,7 +178,7 @@ func (a *API) GetTicket(ctx context.Context, req *api.GetTicketHttpRequest) (*pr
 	)
 }
 
-// ListTickets implements api.TickenatorServiceServer
+// ListTickets implements api.UsersServiceServer
 func (a *API) ListTickets(ctx context.Context, req *api.ListTicketsHttpRequest) (*api.ListTicketsResponse, error) {
 	id, err := a.getUserId(ctx)
 	if err != nil {
@@ -188,12 +188,106 @@ func (a *API) ListTickets(ctx context.Context, req *api.ListTicketsHttpRequest) 
 		return nil, fmt.Errorf("Bad auth header")
 	}
 	return a.service.tickenator.ListTickets(
-		ctx, 
+		ctx,
 		&api.ListTicketsRequest{
 			PageNum:  req.PageNum,
 			PageSize: req.PageSize,
 		},
 	)
+}
+
+// ViewTicket implements api.UsersServiceServer
+func (a *API) ViewTicket(ctx context.Context, req *api.ViewTicketRequest) (*api.ViewTicketResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+
+	err = a.service.SendKafkaEvent(ctx, req.GetId(), id, "view")
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.ViewTicketResponse{}, nil
+}
+
+// LikeTicket implements api.UsersServiceServer
+func (a *API) LikeTicket(ctx context.Context, req *api.LikeTicketRequest) (*api.LikeTicketResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+
+	err = a.service.SendKafkaEvent(ctx, req.GetId(), id, "like")
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.LikeTicketResponse{}, nil
+}
+
+// TicketStats implements api.UsersServiceServer
+func (a *API) TicketStats(ctx context.Context, req *api.TicketStatsRequest) (*api.TicketStatsResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+
+	return a.service.stats.TicketStats(ctx, req)
+}
+
+// TopTickets implements api.UsersServiceServer
+func (a *API) TopTickets(ctx context.Context, req *api.TopTicketsRequest) (*api.TopTicketsResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+
+	resp, err := a.service.stats.TopTickets(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, info := range resp.GetTop() {
+		ticket, err := a.service.tickenator.GetTicket(
+			ctx,
+			&api.GetTicketRequest{
+				Id: info.GetTicketId(),
+			},
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		info.AuthorId = ticket.GetAuthorId()
+	}
+
+	return resp, nil
+}
+
+// TopUsers implements api.UsersServiceServer
+func (a *API) TopUsers(ctx context.Context, req *api.TopUsersRequest) (*api.TopUsersResponse, error) {
+	id, err := a.getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !a.service.CheckUser(id) {
+		return nil, fmt.Errorf("Bad auth header")
+	}
+
+	return a.service.stats.TopUsers(ctx, req)
 }
 
 func (a *API) Mount(router chi.Router) {

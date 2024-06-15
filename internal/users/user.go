@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	Id       uint
+	Id       uint64
 	Login    string
 	Password string
 	Name     sql.NullString

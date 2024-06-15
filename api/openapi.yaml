@@ -110,6 +110,119 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/tickets/like:
+        put:
+            tags:
+                - UsersService
+            operationId: UsersService_LikeTicket
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LikeTicketRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LikeTicketResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/tickets/stats/top_tickets:
+        get:
+            tags:
+                - UsersService
+            operationId: UsersService_TopTickets
+            parameters:
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TopTicketsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/tickets/stats/top_users:
+        get:
+            tags:
+                - UsersService
+            operationId: UsersService_TopUsers
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TopUsersResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/tickets/stats/{id}:
+        get:
+            tags:
+                - UsersService
+            operationId: UsersService_TicketStats
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TicketStatsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/tickets/view:
+        put:
+            tags:
+                - UsersService
+            operationId: UsersService_ViewTicket
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ViewTicketRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ViewTicketResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/tickets/{id}:
         get:
             tags:
@@ -251,6 +364,14 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        LikeTicketRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+        LikeTicketResponse:
+            type: object
+            properties: {}
         ListTicketsResponse:
             type: object
             properties:
@@ -291,6 +412,36 @@ components:
                     type: string
                 description:
                     type: string
+        TicketInfo:
+            type: object
+            properties:
+                ticketId:
+                    type: string
+                authorId:
+                    type: string
+                count:
+                    type: string
+        TicketStatsResponse:
+            type: object
+            properties:
+                views:
+                    type: string
+                likes:
+                    type: string
+        TopTicketsResponse:
+            type: object
+            properties:
+                top:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/TicketInfo'
+        TopUsersResponse:
+            type: object
+            properties:
+                top:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserInfo'
         UpdateTicketHttpRequest:
             type: object
             properties:
@@ -301,6 +452,21 @@ components:
                 description:
                     type: string
         UpdateTicketResponse:
+            type: object
+            properties: {}
+        UserInfo:
+            type: object
+            properties:
+                userId:
+                    type: string
+                likes:
+                    type: string
+        ViewTicketRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+        ViewTicketResponse:
             type: object
             properties: {}
 tags:

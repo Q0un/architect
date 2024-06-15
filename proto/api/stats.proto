@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package api;
+
+import "google/api/annotations.proto";
+import "stats/stats.proto";
+
+option go_package = "proto/api";
+
+service StatsService {
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/healthcheck"
+        };
+    }
+
+    rpc TicketStats(TicketStatsRequest) returns (TicketStatsResponse) {
+    }
+
+    rpc TopTickets(TopTicketsRequest) returns (TopTicketsResponse) {
+    }
+
+    rpc TopUsers(TopUsersRequest) returns (TopUsersResponse) {
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message HealthCheckRequest {
+}
+
+message HealthCheckResponse {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message TicketStatsRequest {
+    uint64 id = 1;
+}
+
+message TicketStatsResponse {
+    uint64 views = 1;
+    uint64 likes = 2;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message TopTicketsRequest {
+    string type = 1;
+}
+
+message TopTicketsResponse {
+    repeated stats.TicketInfo top = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message TopUsersRequest {
+}
+
+message TopUsersResponse {
+    repeated stats.UserInfo top = 1;
+}
